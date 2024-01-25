@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <ul class="flex justify-between align-center gap-4">
+          <li><a href="index.html">Index</a></li>
+          <li class="menu-login-register"><a href="login.html">Login</a></li>
+          <li class="menu-login-register">
+            <a href="register.html">Register</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main class="flex justify-center align-center">
+      <div class="">
+        <h1>
+          Hallo <span id="nama-user">User</span>, Selamat datang di halaman
+          index
+        </h1>
+        <button id="logout-button" class="logout-button">
+          <a href="login.html">Logout</a>
+        </button>
+      </div>
+    </main>
+    <script>
+      const namaUser = document.getElementById("nama-user");
+      const logoutButton = document.getElementById("logout-button");
+      const menuLoginRegister = document.querySelectorAll(
+        ".menu-login-register"
+      );
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user) {
+        hideElement(logoutButton);
+      } else {
+        initializeLoggedInState(user);
+      }
+      function hideElement(element) {
+        element.style.display = "none";
+      }
+      function showElement(element, displayValue = "block") {
+        element.style.display = displayValue;
+      }
+      function initializeLoggedInState(user) {
+        namaUser.textContent = user?.namaLengkap;
+        showElement(logoutButton);
+        logoutButton.addEventListener("click", () => {
+          localStorage.removeItem("user");
+          window.location.reload();
+        });
+
+        menuLoginRegister.forEach((menu) => {
+          hideElement(menu);
+        });
+      }
+    </script>
+  </body>
+</html>

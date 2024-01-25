@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index - Register</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <ul class="flex justify-between align-center gap-4">
+          <li><a href="index.html">Index</a></li>
+          <li><a href="login.html">Login</a></li>
+          <li><a href="register.html">Register</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main class="flex justify-center align-center">
+      <div class="container">
+        <form
+          method="POST"
+          id="login-form"
+          class="flex flex-column gap-2 glass-effect"
+        >
+          <div>
+            <label for="nama-lengkap">Nama Lengkap</label>
+            <div class="w-full relative">
+              <input
+                id="nama-lengkap"
+                class="w-full"
+                type="text"
+                name="nama-lengkap"
+              />
+            </div>
+            <span class="message nama-lengkap-message"></span>
+          </div>
+          <div>
+            <label for="email">Email</label>
+            <div class="w-full relative">
+              <input id="email" class="w-full" type="email" name="email" />
+            </div>
+            <span class="message email-message"></span>
+          </div>
+          <div>
+            <label for="password">password</label>
+            <div class="w-full relative">
+              <input
+                id="password"
+                class="w-full"
+                type="password"
+                name="password"
+              />
+              <img
+                id="password-icon"
+                class="password-icon"
+                src="assets/eye-slash.svg"
+                alt="eye"
+              />
+            </div>
+            <span class="message password-message"></span>
+          </div>
+          <div>
+            <label for="Konfirmasi-password">Konfirmasi password</label>
+            <div class="w-full relative">
+              <input
+                id="Konfirmasi-password"
+                class="w-full"
+                type="password"
+                name="Konfirmasi-password"
+              />
+              <img
+                id="konfirmasi-password-icon"
+                class="password-icon"
+                src="assets/eye-slash.svg"
+                alt="eye"
+              />
+            </div>
+            <span class="message Konfirmasi-password-message"></span>
+          </div>
+          <button id="submit-button" disabled type="submit">Login</button>
+        </form>
+      </div>
+    </main>
+    <script>
+      const form = document.getElementById("login-form");
+      const namaLengkap = document.getElementById("nama-lengkap");
+      const messageNamaLengkap = document.querySelector(
+        ".nama-lengkap-message"
+      );
+      const email = document.getElementById("email");
+      const messageEmail = document.querySelector(".email-message");
+      const password = document.getElementById("password");
+      const messagePassword = document.querySelector(".password-message");
+      const konfirmasiPassword = document.getElementById("Konfirmasi-password");
+      const messageKonfirmasiPassword = document.querySelector(
+        ".Konfirmasi-password-message"
+      );
+      const passwordIcon = document.getElementById("password-icon");
+      const konfirmasiPasswordIcon = document.getElementById(
+        "konfirmasi-password-icon"
+      );
+      const submitButton = document.getElementById("submit-button");
+      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+
+      const updatePasswordMessage = (field, message, valid) => {
+        field.textContent = message;
+        field.classList.toggle("success", valid);
+        field.classList.toggle("error", !valid);
+      };
+
+      const togglePasswordVisibility = (field, icon) => {
+        field.type = field.type === "password" ? "text" : "password";
+        icon.src =
+          field.type === "password" ? "assets/eye-slash.svg" : "assets/eye.svg";
+      };
+
+      const checkPassword = () => {
+        const isValidPassword = regex.test(password.value);
+        const messageText = isValidPassword
+          ? ""
+          : "Password must contain at least 8 characters, 1 uppercase letter, 1 lowercase letter, and 1 number";
+        password.value === ""
+          ? (messagePassword.textContent = "")
+          : updatePasswordMessage(
+              messagePassword,
+              messageText,
+              isValidPassword
+            );
+      };
+
+      const checkKonfirmasiPassword = () => {
+        const isValidKonfirmasiPassword =
+          konfirmasiPassword.value === password.value;
+        const messageText = isValidKonfirmasiPassword
+          ? ""
+          : "Passwords do not match";
+        konfirmasiPassword.value === ""
+          ? (messageKonfirmasiPassword.textContent = "")
+          : updatePasswordMessage(
+              messageKonfirmasiPassword,
+              messageText,
+              isValidKonfirmasiPassword
+            );
+      };
+
+      const checkFormValidity = () => {
+        const isValidNamaLengkap = namaLengkap.value.trim() !== "";
+        const isValidEmail = email.value.trim() !== "";
+        const isValidPassword = regex.test(password.value);
+        const isValidKonfirmasiPassword =
+          konfirmasiPassword.value === password.value;
+        submitButton.disabled =
+          !isValidNamaLengkap ||
+          !isValidEmail ||
+          !isValidPassword ||
+          !isValidKonfirmasiPassword;
+      };
+
+      const handleSubmit = (event) => {
+        event.preventDefault();
+        const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
+        const isEmailExist = existingUsers.some(
+          (user) => user.email === email.value
+        );
+
+        if (isEmailExist) {
+          alert("Email sudah terdaftar");
+          return;
+        }
+
+        const newUser = {
+          namaLengkap: namaLengkap.value,
+          email: email.value,
+          password: password.value,
+        };
+
+        existingUsers.push(newUser);
+        localStorage.setItem("users", JSON.stringify(existingUsers));
+        alert("Register berhasil");
+        window.location.href = "login.html";
+      };
+
+      form.addEventListener("submit", handleSubmit);
+      namaLengkap.addEventListener("input", checkFormValidity);
+      email.addEventListener("input", checkFormValidity);
+      password.addEventListener("input", () => {
+        checkPassword();
+        checkFormValidity();
+      });
+      konfirmasiPassword.addEventListener("input", () => {
+        checkKonfirmasiPassword();
+        checkFormValidity();
+      });
+
+      passwordIcon.addEventListener("click", () => {
+        togglePasswordVisibility(password, passwordIcon);
+      });
+
+      konfirmasiPasswordIcon.addEventListener("click", () => {
+        togglePasswordVisibility(konfirmasiPassword, konfirmasiPasswordIcon);
+      });
+    </script>
+  </body>
+</html>
